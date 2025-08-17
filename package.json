@@ -1,0 +1,19 @@
+{
+  "name": "classco",
+  "version": "1.0.0",
+  "description": "Classco - Virtual Classroom Application",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx serve"
+  },
+  "keywords": [
+    "classroom",
+    "education",
+    "virtual"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+} 

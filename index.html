@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classco</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Firebase SDK - Using a stable older version -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <h1>Classco</h1>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="login-tab">Login</button>
+                <button class="auth-tab" id="register-tab">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button id="login-btn">Login</button>
+                
+                <p id="login-error" class="error-message"></p>
+                <div class="form-footer">
+                    <a href="#" id="forgot-password-link">Forgot Password?</a>
+                </div>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <div class="input-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password" required>
+                    <small class="password-hint">Password must be at least 6 characters long</small>
+                </div>
+                <div class="input-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm your password" required>
+                </div>
+                <button id="register-btn">Register</button>
+                
+                <p id="register-error" class="error-message"></p>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div id="forgot-password-form" class="auth-form" style="display: none;">
+                <div class="input-group">
+                    <label for="reset-email">Email</label>
+                    <input type="email" id="reset-email" placeholder="Enter your email" required>
+                </div>
+                <button id="reset-password-btn">Reset Password</button>
+                <p id="reset-message"></p>
+                <div class="form-footer">
+                    <a href="#" id="back-to-login-link">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to log out? We will miss you, please visit again!</p>
+            <div class="modal-buttons">
+                <button id="cancel-logout">Cancel</button>
+                <button id="confirm-logout">Yes, Log Out</button>
+            </div>
+            <p id="logout-status" class="status-message"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" style="display: none;">
+        <header>
+            <div class="logo">
+                <h2>Classco</h2>
+            </div>
+            <div class="user-info">
+                <span id="user-email"></span>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </header>
+
+        <main class="dashboard-container">
+            <div class="sidebar">
+                <h3>Menu</h3>
+                <ul>
+                    <li class="active"><a href="#rooms">Classrooms</a></li>
+                    <li><a href="#join-room">Join Room</a></li>
+                    <li><a href="#create-room">Create Room</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <section id="rooms-section">
+                    <h2>Available Classrooms</h2>
+                    <div class="room-grid">
+                        <div class="room-card" data-room="mathematics">
+                            <div class="room-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3>Mathematics</h3>
+                            <p>Join the Math classroom for discussions and learning.</p>
+                            <button class="join-btn">Join Room</button>
+                        </div>
+                        <div class="room-card" data-room="physics">
+                            <div class="room-icon">
+                                <i class="fas fa-atom"></i>
+                            </div>
+                            <h3>Physics</h3>
+                            <p>Explore physics concepts and experiments.</p>
+                            <button class="join-btn">Join Room</button>
+                        </div>
+                        <div class="room-card" data-room="chemistry">
+                            <div class="room-icon">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <h3>Chemistry</h3>
+                            <p>Learn about chemical reactions and compounds.</p>
+                            <button class="join-btn">Join Room</button>
+                        </div>
+                        <div class="room-card" data-room="gaming">
+                            <div class="room-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <h3>Gaming Room</h3>
+                            <p>Connect with others for fun gaming sessions.</p>
+                            <button class="join-btn">Join Room</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="join-room-section" style="display: none;">
+                    <h2>Join a Classroom</h2>
+                    <div class="join-form">
+                        <div class="input-group">
+                            <label for="room-code">Enter Room Code</label>
+                            <input type="text" id="room-code" placeholder="e.g. MATH123">
+                        </div>
+                        <button id="join-room-btn">Join Room</button>
+                        <p id="join-error" class="error-message"></p>
+                    </div>
+                </section>
+
+                <section id="create-room-section" style="display: none;">
+                    <h2>Create a New Classroom</h2>
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label for="room-name">Room Name</label>
+                            <input type="text" id="room-name" placeholder="e.g. Advanced Physics">
+                        </div>
+                        <div class="input-group">
+                            <label for="room-type">Room Type</label>
+                            <select id="room-type">
+                                <option value="study">Study Room</option>
+                                <option value="gaming">Gaming Room</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <button id="create-room-btn">Create Room</button>
+                        <p id="create-message"></p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Classroom Screen -->
+    <div id="classroom-screen" style="display: none;">
+        <div class="classroom-header">
+            <div class="room-info">
+                <h2 id="room-title">Classroom</h2>
+                <p id="room-timer">Time remaining: <span id="timer">30:00</span></p>
+                <p id="room-code-display">Room code: <span id="current-room-code">CODE123</span></p>
+            </div>
+            <button id="leave-room-btn">Leave Room</button>
+        </div>
+
+        <div class="classroom-container">
+            <div class="content-container">
+                <div class="whiteboard">
+                    <div class="whiteboard-header">
+                        <h3>Class Notes</h3>
+                    </div>
+                    <div class="whiteboard-content" id="whiteboard-content">
+                        <div class="note">
+                            <h4>Welcome to the classroom!</h4>
+                            <p>This is where class notes and resources will appear.</p>
+                            <ul>
+                                <li>Ask questions in the chat</li>
+                                <li>Share your thoughts and ideas</li>
+                                <li>Collaborate with other students</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="participants-panel">
+                    <div class="participants-header">
+                        <h3>Participants</h3>
+                    </div>
+                    <div class="participants-list" id="participants-list">
+                        <!-- Participants will be added dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>Chat</h3>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Chat messages will be added dynamically -->
+                </div>
+                <div class="chat-input">
+                    <button id="attachment-btn" class="attachment-btn" title="Add attachment">
+                        <i class="fas fa-paperclip"></i>
+                        <span class="attachment-spinner" style="display: none;"></span>
+                    </button>
+                    <input type="text" id="message-input" placeholder="Type your message...">
+                    <button id="send-message-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <input type="file" id="file-input" accept="image/*,video/*" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Firebase -->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5agwEFKOsS-ojMnYJNcvWYTuYwgytgq8",
+            authDomain: "classco-49de1.firebaseapp.com",
+            projectId: "classco-49de1",
+            storageBucket: "classco-49de1.appspot.com",
+            messagingSenderId: "387463824507",
+            appId: "1:387463824507:web:95404cc1e6a19bdee44ede",
+            measurementId: "G-FJ8DDHWJP7"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Get a reference to the auth and firestore services
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // Force logout when page loads (to fix the automatic login issue)
+        auth.signOut().then(() => {
+            console.log("Forced logout on page load");
+        }).catch(error => {
+            console.error("Error during forced logout:", error);
+        });
+    </script>
+    
+    <!-- Auth Script with updated logout functionality -->
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements - Authentication
+            const loginScreen = document.getElementById('login-screen');
+            const dashboardScreen = document.getElementById('dashboard-screen');
+            const classroomScreen = document.getElementById('classroom-screen');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+            const loginTab = document.getElementById('login-tab');
+            const registerTab = document.getElementById('register-tab');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const backToLoginLink = document.getElementById('back-to-login-link');
+            
+            // DOM Elements - Logout Modal
+            const logoutModal = document.getElementById('logout-modal');
+            const confirmLogoutBtn = document.getElementById('confirm-logout');
+            const cancelLogoutBtn = document.getElementById('cancel-logout');
+            const logoutStatus = document.getElementById('logout-status');
+            
+            // DOM Elements - Dashboard
+            const userEmailDisplay = document.getElementById('user-email');
+            const roomsSection = document.getElementById('rooms-section');
+            const joinRoomSection = document.getElementById('join-room-section');
+            const createRoomSection = document.getElementById('create-room-section');
+            const sidebarLinks = document.querySelectorAll('.sidebar ul li a');
+            const joinButtons = document.querySelectorAll('.join-btn');
+            const joinRoomBtn = document.getElementById('join-room-btn');
+            const createRoomBtn = document.getElementById('create-room-btn');
+            
+            // DOM Elements - Classroom
+            const leaveRoomBtn = document.getElementById('leave-room-btn');
+            const sendMessageBtn = document.getElementById('send-message-btn');
+            const attachmentBtn = document.getElementById('attachment-btn');
+            const fileInput = document.getElementById('file-input');
+            const attachmentSpinner = document.querySelector('.attachment-spinner');
+            
+            // Application state
+            let currentUser = null;
+            let activeRoom = null;
+            let countdownInterval = null;
+            let currentAttachment = null;
+            
+            // Mock database
+            const rooms = [
+                { id: 'mathematics', name: 'Mathematics', type: 'study', code: 'MATH101' },
+                { id: 'physics', name: 'Physics', type: 'study', code: 'PHYS102' },
+                { id: 'chemistry', name: 'Chemistry', type: 'study', code: 'CHEM103' },
+                { id: 'gaming', name: 'Gaming Room', type: 'gaming', code: 'GAME104' }
+            ];
+            
+            // Show login form as default
+            if (loginTab) {
+                loginTab.addEventListener('click', function() {
+                    showAuthForm(loginForm);
+                });
+            }
+            
+            // Show register form when clicked
+            if (registerTab) {
+                registerTab.addEventListener('click', function() {
+                    showAuthForm(registerForm);
+                });
+            }
+            
+            // Show forgot password form
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showAuthForm(forgotPasswordForm);
+                });
+            }
+            
+            // Back to login
+            if (backToLoginLink) {
+                backToLoginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showAuthForm(loginForm);
+                });
+            }
+            
+            // Show the appropriate auth form
+            function showAuthForm(form) {
+                if (loginForm) loginForm.style.display = 'none';
+                if (registerForm) registerForm.style.display = 'none';
+                if (forgotPasswordForm) forgotPasswordForm.style.display = 'none';
+                
+                if (form) form.style.display = 'block';
+                
+                // Update active tab
+                if (loginTab && registerTab) {
+                    loginTab.classList.remove('active');
+                    registerTab.classList.remove('active');
+                    
+                    if (form === loginForm) loginTab.classList.add('active');
+                    if (form === registerForm) registerTab.classList.add('active');
+                }
+            }
+            
+            // Email password login
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    const email = document.getElementById('login-email').value.trim();
+                    const password = document.getElementById('login-password').value;
+                    const loginError = document.getElementById('login-error');
+                    
+                    // Clear previous errors
+                    if (loginError) loginError.textContent = '';
+                    
+                    // Simple validation
+                    if (!email || !password) {
+                        loginError.textContent = 'Please enter both email and password';
+                        return;
+                    }
+                    
+                    // Disable button during login
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = 'Logging in...';
+                    
+                    // Attempt to sign in
+                    auth.signInWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            // Signed in
+                            const user = userCredential.user;
+                            console.log('Logged in user:', user.email);
+                            
+                            // Clear form
+                            document.getElementById('login-email').value = '';
+                            document.getElementById('login-password').value = '';
+                            
+                            // Will be handled by auth state change listener
+                        })
+                        .catch((error) => {
+                            console.error('Login error:', error);
+                            loginError.textContent = error.message;
+                            
+                            // Re-enable button
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Login';
+                        });
+                });
+            }
+            
+            // Register new user
+            if (registerBtn) {
+                registerBtn.addEventListener('click', function() {
+                    const name = document.getElementById('register-name').value.trim();
+                    const email = document.getElementById('register-email').value.trim();
+                    const password = document.getElementById('register-password').value;
+                    const confirmPassword = document.getElementById('register-confirm-password').value;
+                    const registerError = document.getElementById('register-error');
+                    
+                    // Clear previous errors
+                    if (registerError) registerError.textContent = '';
+                    
+                    // Validate inputs
+                    if (!name || !email || !password || !confirmPassword) {
+                        registerError.textContent = 'Please fill in all fields';
+                        return;
+                    }
+                    
+                    if (password.length < 6) {
+                        registerError.textContent = 'Password must be at least 6 characters';
+                        return;
+                    }
+                    
+                    if (password !== confirmPassword) {
+                        registerError.textContent = 'Passwords do not match';
+                        return;
+                    }
+                    
+                    // Disable button
+                    registerBtn.disabled = true;
+                    registerBtn.textContent = 'Registering...';
+                    
+                    // Create user
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            // User created
+                            const user = userCredential.user;
+                            console.log('User registered:', user.email);
+                            
+                            // Create user profile
+                            return db.collection('users').doc(user.uid).set({
+                                name: name,
+                                email: email,
+                                createdAt: new Date()
+                            });
+                        })
+                        .then(() => {
+                            // Clear form
+                            document.getElementById('register-name').value = '';
+                            document.getElementById('register-email').value = '';
+                            document.getElementById('register-password').value = '';
+                            document.getElementById('register-confirm-password').value = '';
+                            
+                            // Will be handled by auth state change listener
+                        })
+                        .catch((error) => {
+                            console.error('Registration error:', error);
+                            registerError.textContent = error.message;
+                            
+                            // Re-enable button
+                            registerBtn.disabled = false;
+                            registerBtn.textContent = 'Register';
+                        });
+                });
+            }
+            
+            // Show logout confirmation modal
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    if (logoutModal) {
+                        logoutModal.style.display = 'flex';
+                    }
+                });
+            }
+            
+            // Cancel logout
+            if (cancelLogoutBtn) {
+                cancelLogoutBtn.addEventListener('click', function() {
+                    if (logoutModal) {
+                        logoutModal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Confirm logout
+            if (confirmLogoutBtn) {
+                confirmLogoutBtn.addEventListener('click', function() {
+                    // Show logging out message
+                    if (logoutStatus) {
+                        logoutStatus.textContent = 'Logging out...';
+                    }
+                    
+                    // Disable buttons
+                    if (confirmLogoutBtn) confirmLogoutBtn.disabled = true;
+                    if (cancelLogoutBtn) cancelLogoutBtn.disabled = true;
+                    
+                    // Sign out after a brief delay (to show the logging out message)
+                    setTimeout(() => {
+                        auth.signOut()
+                            .then(() => {
+                                console.log('User logged out');
+                                // Close the modal - will be handled by auth state change listener
+                                if (logoutModal) {
+                                    logoutModal.style.display = 'none';
+                                }
+                                
+                                // Re-enable buttons
+                                if (confirmLogoutBtn) confirmLogoutBtn.disabled = false;
+                                if (cancelLogoutBtn) cancelLogoutBtn.disabled = false;
+                                
+                                // Clear status message
+                                if (logoutStatus) {
+                                    logoutStatus.textContent = '';
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Logout error:', error);
+                                
+                                // Show error message
+                                if (logoutStatus) {
+                                    logoutStatus.textContent = 'Error logging out. Please try again.';
+                                }
+                                
+                                // Re-enable buttons
+                                if (confirmLogoutBtn) confirmLogoutBtn.disabled = false;
+                                if (cancelLogoutBtn) cancelLogoutBtn.disabled = false;
+                            });
+                    }, 1500);
+                });
+            }
+            
+            // Auth state change listener
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in
+                    console.log('User is signed in:', user.email);
+                    currentUser = user;
+                    
+                    // Update UI with user info
+                    if (userEmailDisplay) {
+                        userEmailDisplay.textContent = user.email;
+                    }
+                    
+                    // Show dashboard screen
+                    if (loginScreen) loginScreen.style.display = 'none';
+                    if (dashboardScreen) dashboardScreen.style.display = 'block';
+                    if (classroomScreen) classroomScreen.style.display = 'none';
+                } else {
+                    // User is signed out
+                    console.log('User is signed out');
+                    currentUser = null;
+                    
+                    // Show login screen
+                    if (loginScreen) loginScreen.style.display = 'flex';
+                    if (dashboardScreen) dashboardScreen.style.display = 'none';
+                    if (classroomScreen) classroomScreen.style.display = 'none';
+                    
+                    // Reset any visible error messages
+                    const loginError = document.getElementById('login-error');
+                    if (loginError) loginError.textContent = '';
+                    
+                    // Reset input fields
+                    const loginEmail = document.getElementById('login-email');
+                    const loginPassword = document.getElementById('login-password');
+                    if (loginEmail) loginEmail.value = '';
+                    if (loginPassword) loginPassword.value = '';
+                    
+                    // Reset login button text (in case it was "Logging in...")
+                    const loginBtn = document.getElementById('login-btn');
+                    if (loginBtn) {
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Login';
+                    }
+                }
+            });
+            
+            // Dashboard sidebar navigation
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    sidebarLinks.forEach(l => l.parentElement.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.parentElement.classList.add('active');
+                    
+                    // Determine which section to show
+                    const target = this.getAttribute('href').substring(1);
+                    if (target === 'rooms') {
+                        showDashboardSection(roomsSection);
+                    } else if (target === 'join-room') {
+                        showDashboardSection(joinRoomSection);
+                    } else if (target === 'create-room') {
+                        showDashboardSection(createRoomSection);
+                    }
+                });
+            });
+            
+            // Function to show dashboard section
+            function showDashboardSection(section) {
+                if (roomsSection) roomsSection.style.display = 'none';
+                if (joinRoomSection) joinRoomSection.style.display = 'none';
+                if (createRoomSection) createRoomSection.style.display = 'none';
+                
+                if (section) section.style.display = 'block';
+            }
+            
+            // Join Room buttons
+            joinButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const roomCard = this.closest('.room-card');
+                    if (roomCard) {
+                        const roomId = roomCard.getAttribute('data-room');
+                        joinRoom(roomId);
+                    }
+                });
+            });
+            
+            // Join room by code
+            if (joinRoomBtn) {
+                joinRoomBtn.addEventListener('click', function() {
+                    const roomCode = document.getElementById('room-code').value.trim();
+                    const joinError = document.getElementById('join-error');
+                    
+                    if (!roomCode) {
+                        if (joinError) joinError.textContent = 'Please enter a room code';
+                        return;
+                    }
+                    
+                    // Find room with matching code
+                    const room = rooms.find(r => r.code === roomCode);
+                    if (room) {
+                        if (joinError) joinError.textContent = '';
+                        joinRoom(room.id);
+                    } else {
+                        if (joinError) joinError.textContent = 'Invalid room code';
+                    }
+                });
+            }
+            
+            // Create room
+            if (createRoomBtn) {
+                createRoomBtn.addEventListener('click', function() {
+                    const roomName = document.getElementById('room-name').value.trim();
+                    const roomType = document.getElementById('room-type').value;
+                    const createMessage = document.getElementById('create-message');
+                    
+                    if (!roomName) {
+                        if (createMessage) {
+                            createMessage.textContent = 'Please enter a room name';
+                            createMessage.style.color = '#e74c3c';
+                        }
+                        return;
+                    }
+                    
+                    // Generate room code
+                    const roomCode = generateRoomCode();
+                    
+                    // Create new room
+                    const newRoom = {
+                        id: Date.now().toString(),
+                        name: roomName,
+                        type: roomType,
+                        code: roomCode,
+                        createdBy: currentUser.uid,
+                        createdAt: new Date()
+                    };
+                    
+                    // Add to mock database (in a real app, you would save to Firestore)
+                    rooms.push(newRoom);
+                    
+                    if (createMessage) {
+                        createMessage.textContent = `Room created! Code: ${roomCode}`;
+                        createMessage.style.color = '#2ecc71';
+                    }
+                    
+                    // Clear form
+                    document.getElementById('room-name').value = '';
+                    
+                    // Join the new room after a short delay
+                    setTimeout(() => {
+                        joinRoom(newRoom.id);
+                    }, 1500);
+                });
+            }
+            
+            // Join room function (mock implementation)
+            function joinRoom(roomId) {
+                // Find room from our mock data
+                const room = rooms.find(r => r.id === roomId);
+                if (!room) return;
+                
+                activeRoom = room;
+                
+                // Update room UI
+                document.getElementById('room-title').textContent = room.name;
+                document.getElementById('current-room-code').textContent = room.code;
+                
+                // Show classroom screen
+                if (dashboardScreen) dashboardScreen.style.display = 'none';
+                if (classroomScreen) classroomScreen.style.display = 'block';
+                
+                // Add system message
+                addChatMessage(`You joined the ${room.name} room`, 'system');
+                
+                // Start countdown timer (30 minutes)
+                startCountdown(30 * 60);
+            }
+            
+            // Leave room function
+            if (leaveRoomBtn) {
+                leaveRoomBtn.addEventListener('click', function() {
+                    // Clear active room
+                    activeRoom = null;
+                    
+                    // Clear chat messages
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) chatMessages.innerHTML = '';
+                    
+                    // Stop countdown timer
+                    if (countdownInterval) {
+                        clearInterval(countdownInterval);
+                        countdownInterval = null;
+                    }
+                    
+                    // Show dashboard screen
+                    if (dashboardScreen) dashboardScreen.style.display = 'block';
+                    if (classroomScreen) classroomScreen.style.display = 'none';
+                });
+            }
+            
+            // Attachment button click handler
+            if (attachmentBtn) {
+                attachmentBtn.addEventListener('click', function() {
+                    // Trigger file input
+                    if (fileInput) fileInput.click();
+                });
+            }
+            
+            // File input change handler
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        
+                        // Check file size (limit to 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size too large. Maximum size is 5MB.');
+                            return;
+                        }
+                        
+                        // Show spinner
+                        if (attachmentSpinner) {
+                            attachmentSpinner.style.display = 'block';
+                        }
+                        
+                        // Store the current attachment
+                        currentAttachment = file;
+                        
+                        // Simulate upload progress
+                        simulateUploadProgress();
+                        
+                        // Upload file to Firebase Storage
+                        uploadFile(file);
+                    }
+                });
+            }
+            
+            // Simulate upload progress
+            function simulateUploadProgress() {
+                // Create progress bar if it doesn't exist
+                let progressBar = document.querySelector('.attachment-upload-progress');
+                if (!progressBar) {
+                    progressBar = document.createElement('div');
+                    progressBar.className = 'attachment-upload-progress';
+                    const chatInput = document.querySelector('.chat-input');
+                    chatInput.parentNode.insertBefore(progressBar, chatInput);
+                }
+                
+                // Reset progress
+                let progress = 0;
+                progressBar.style.width = '0%';
+                progressBar.style.display = 'block';
+                
+                // Animate progress
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = Math.min(progress, 100) + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            progressBar.style.display = 'none';
+                        }, 500);
+                    }
+                }, 100);
+            }
+            
+            // Upload file to Firebase Storage
+            function uploadFile(file) {
+                if (!currentUser) return;
+                
+                const fileType = file.type.split('/')[0]; // 'image' or 'video'
+                const extension = file.name.split('.').pop();
+                const fileName = `${fileType}_${Date.now()}.${extension}`;
+                
+                // Create a storage reference
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child(`attachments/${currentUser.uid}/${fileName}`);
+                
+                // Upload file
+                const uploadTask = fileRef.put(file);
+                
+                // Monitor upload progress
+                uploadTask.on('state_changed', 
+                    // Progress
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload progress: ' + progress + '%');
+                    },
+                    // Error
+                    (error) => {
+                        console.error('Upload error:', error);
+                        if (attachmentSpinner) {
+                            attachmentSpinner.style.display = 'none';
+                        }
+                    },
+                    // Complete
+                    () => {
+                        // Get download URL
+                        uploadTask.snapshot.ref.getDownloadURL()
+                            .then((downloadURL) => {
+                                console.log('File available at', downloadURL);
+                                
+                                // Hide spinner
+                                if (attachmentSpinner) {
+                                    attachmentSpinner.style.display = 'none';
+                                }
+                                
+                                // Send message with attachment
+                                if (activeRoom) {
+                                    sendMessageWithAttachment(downloadURL, fileType);
+                                }
+                                
+                                // Clear the file input
+                                if (fileInput) {
+                                    fileInput.value = '';
+                                }
+                                
+                                // Clear current attachment
+                                currentAttachment = null;
+                            });
+                    }
+                );
+            }
+            
+            // Send message with attachment
+            function sendMessageWithAttachment(attachmentUrl, attachmentType) {
+                // Add message to chat
+                const message = {
+                    sender: currentUser.email,
+                    text: '',
+                    attachmentUrl: attachmentUrl,
+                    attachmentType: attachmentType,
+                    timestamp: new Date()
+                };
+                
+                // Display in UI
+                displayMessageWithAttachment(message);
+                
+                // In a real app, you would save this to Firestore
+                if (currentUser && activeRoom) {
+                    db.collection('rooms').doc(activeRoom.id)
+                        .collection('messages').add({
+                            sender: currentUser.email,
+                            senderId: currentUser.uid,
+                            text: '',
+                            attachmentUrl: attachmentUrl,
+                            attachmentType: attachmentType,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .then(() => {
+                            console.log('Message with attachment saved to Firestore');
+                        })
+                        .catch(error => {
+                            console.error('Error saving message:', error);
+                        });
+                }
+            }
+            
+            // Display message with attachment
+            function displayMessageWithAttachment(message) {
+                const chatMessages = document.getElementById('chat-messages');
+                if (!chatMessages) return;
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                
+                // Determine if it's the current user's message
+                if (currentUser && message.sender === currentUser.email) {
+                    messageElement.classList.add('you');
+                }
+                
+                // Create sender element
+                const senderElement = document.createElement('div');
+                senderElement.className = 'sender';
+                senderElement.textContent = message.sender;
+                messageElement.appendChild(senderElement);
+                
+                // Add text if present
+                if (message.text) {
+                    const textElement = document.createElement('div');
+                    textElement.textContent = message.text;
+                    messageElement.appendChild(textElement);
+                }
+                
+                // Create attachment container
+                const attachmentContainer = document.createElement('div');
+                attachmentContainer.className = 'attachment-container';
+                
+                // Add appropriate media element based on attachment type
+                if (message.attachmentType === 'image') {
+                    const img = document.createElement('img');
+                    img.src = message.attachmentUrl;
+                    img.alt = 'Attachment';
+                    img.addEventListener('click', () => showFullscreenAttachment(message.attachmentUrl));
+                    attachmentContainer.appendChild(img);
+                } else if (message.attachmentType === 'video') {
+                    const video = document.createElement('video');
+                    video.src = message.attachmentUrl;
+                    video.controls = true;
+                    attachmentContainer.appendChild(video);
+                }
+                
+                messageElement.appendChild(attachmentContainer);
+                chatMessages.appendChild(messageElement);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Show attachment in fullscreen
+            function showFullscreenAttachment(imageUrl) {
+                // Create fullscreen container
+                const fullscreenDiv = document.createElement('div');
+                fullscreenDiv.className = 'fullscreen-attachment';
+                
+                // Create close button
+                const closeButton = document.createElement('div');
+                closeButton.className = 'close-fullscreen';
+                closeButton.innerHTML = '&times;';
+                closeButton.addEventListener('click', () => {
+                    document.body.removeChild(fullscreenDiv);
+                });
+                
+                // Create image
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                
+                // Add elements to DOM
+                fullscreenDiv.appendChild(closeButton);
+                fullscreenDiv.appendChild(img);
+                document.body.appendChild(fullscreenDiv);
+                
+                // Close on click outside image
+                fullscreenDiv.addEventListener('click', (e) => {
+                    if (e.target === fullscreenDiv) {
+                        document.body.removeChild(fullscreenDiv);
+                    }
+                });
+            }
+            
+            // Function to generate room code
+            function generateRoomCode() {
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 6; i++) {
+                    code += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                return code;
+            }
+            
+            // Enable testing account creation
+            console.log('To create a test account, run: createTestUser()');
+            
+            // Send message
+            if (sendMessageBtn) {
+                sendMessageBtn.addEventListener('click', function() {
+                    const messageInput = document.getElementById('message-input');
+                    if (messageInput && messageInput.value.trim() !== '') {
+                        sendMessage(messageInput.value.trim());
+                        messageInput.value = '';
+                    }
+                });
+                
+                // Send message on Enter key
+                const messageInput = document.getElementById('message-input');
+                if (messageInput) {
+                    messageInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter' && this.value.trim() !== '') {
+                            sendMessage(this.value.trim());
+                            this.value = '';
+                        }
+                    });
+                }
+            }
+            
+            // Send text message
+            function sendMessage(text) {
+                if (!text || !activeRoom || !currentUser) return;
+                
+                // Create message object
+                const message = {
+                    sender: currentUser.email,
+                    text: text,
+                    timestamp: new Date()
+                };
+                
+                // Display in UI
+                addChatMessage(text, 'you');
+                
+                // In a real app, you would save this to Firestore
+                if (currentUser && activeRoom) {
+                    db.collection('rooms').doc(activeRoom.id)
+                        .collection('messages').add({
+                            sender: currentUser.email,
+                            senderId: currentUser.uid,
+                            text: text,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .then(() => {
+                            console.log('Message saved to Firestore');
+                        })
+                        .catch(error => {
+                            console.error('Error saving message:', error);
+                        });
+                }
+            }
+            
+            // Add chat message to UI
+            function addChatMessage(text, type) {
+                const chatMessages = document.getElementById('chat-messages');
+                if (!chatMessages) return;
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                
+                if (type === 'you') {
+                    messageElement.classList.add('you');
+                    
+                    const senderElement = document.createElement('div');
+                    senderElement.className = 'sender';
+                    senderElement.textContent = currentUser ? currentUser.email : 'You';
+                    messageElement.appendChild(senderElement);
+                    
+                    const textElement = document.createElement('div');
+                    textElement.textContent = text;
+                    messageElement.appendChild(textElement);
+                } else if (type === 'system') {
+                    messageElement.classList.add('system');
+                    messageElement.textContent = text;
+                }
+                
+                chatMessages.appendChild(messageElement);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Start countdown timer
+            function startCountdown(seconds) {
+                // Clear existing timer
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                
+                // Update timer display
+                const timerEl = document.getElementById('timer');
+                if (timerEl) {
+                    updateTimerDisplay(seconds, timerEl);
+                }
+                
+                // Start interval
+                countdownInterval = setInterval(() => {
+                    seconds--;
+                    
+                    if (timerEl) {
+                        updateTimerDisplay(seconds, timerEl);
+                    }
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        addChatMessage('Session time has expired.', 'system');
+                        
+                        // Return to dashboard after 3 seconds
+                        setTimeout(() => {
+                            if (leaveRoomBtn) {
+                                leaveRoomBtn.click();
+                            }
+                        }, 3000);
+                    }
+                }, 1000);
+            }
+            
+            // Update timer display
+            function updateTimerDisplay(seconds, timerEl) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                
+                timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                // Change color when less than 5 minutes
+                if (seconds < 300) {
+                    timerEl.style.color = '#e74c3c';
+                } else {
+                    timerEl.style.color = '';
+                }
+            }
+        });
+        
+        // Helper function to create a test user (run in console)
+        function createTestUser() {
+            const auth = firebase.auth();
+            const email = 'test@example.com';
+            const password = 'password123';
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log('Test user created:', email);
+                    alert('Test user created! Email: ' + email + ', Password: ' + password);
+                })
+                .catch((error) => {
+                    console.error('Error creating test user:', error);
+                    alert('Error: ' + error.message);
+                });
+        }
+    </script>
+    
+    <!-- Add this CSS at the end of your document or include in your style.css file -->
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-color: #f5f5f5; /* Fallback color */
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/classroom-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3; /* Adjust transparency as needed */
+            z-index: -1;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('images/classroom-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Overlay for better readability */
+        #login-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(41, 128, 185, 0.85), rgba(142, 68, 173, 0.85), rgba(52, 152, 219, 0.85));
+            background-size: 300% 300%;
+            animation: gradientMove 10s ease infinite;
+            z-index: 1;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Position login container above the overlay */
+        .login-container {
+            position: relative;
+            z-index: 2;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 35px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container h1 {
+            margin-bottom: 30px;
+            color: #3498db;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .login-form {
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 0.95rem;
+        }
+
+        .password-hint {
+            display: block;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        #login-btn, #register-btn, #reset-password-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            margin-top: 10px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        #login-btn:hover, #register-btn:hover, #reset-password-btn:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+        }
+
+        /* Ensure the login elements stack properly */
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            background-color: transparent;
+            color: #3498db;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 17px;
+            border-bottom: 2px solid #eee;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab:hover {
+            color: #2980b9;
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .auth-tab.active {
+            border-bottom: 2px solid #3498db;
+            font-weight: 600;
+        }
+
+        /* Dashboard Screen */
+        header {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo h2 {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            font-size: 1.6rem;
+        }
+
+        .user-info {
+            position: static;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info span {
+            margin-right: 15px;
+            font-weight: 500;
+        }
+
+        #logout-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            padding: 8px 15px;
+        }
+
+        #logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 65px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .sidebar h3 {
+            padding: 0 20px;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar li:hover, .sidebar li.active {
+            background-color: #34495e;
+            border-left: 3px solid #3498db;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Room Grid */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .room-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #9b59b6);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .room-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .room-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: white;
+            height: 80px;
+            width: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-card h3 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .room-card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .join-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .join-btn:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-content h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+        
+        .modal-content p {
+            margin-bottom: 25px;
+            color: #34495e;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        #cancel-logout {
+            background-color: #95a5a6;
+        }
+        
+        #cancel-logout:hover {
+            background-color: #7f8c8d;
+        }
+        
+        #confirm-logout {
+            background-color: #e74c3c;
+        }
+        
+        #confirm-logout:hover {
+            background-color: #c0392b;
+        }
+        
+        .status-message {
+            margin-top: 15px;
+            font-style: italic;
+            color: #3498db;
+            font-size: 0.9rem;
+        }
+    </style>
+</body>
+</html> 
